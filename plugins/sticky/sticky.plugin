@@ -1,0 +1,6 @@
+[Plugin]
+Module=sticky
+Name=Sticky
+Description=Sticky opens a windowed view of the Diodon menu.
+Authors=RedHatter <_c_@mail.com>
+Copyright=Copyright © 2014 Christian Timothy Johnson

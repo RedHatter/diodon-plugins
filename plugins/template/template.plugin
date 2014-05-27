@@ -1,0 +1,6 @@
+[Plugin]
+Module=template
+Name=Template
+Description=plugin template
+Authors=RedHatter <_c_@mail.com>
+Copyright=Copyright © 2014 Christian Timothy Johnson
