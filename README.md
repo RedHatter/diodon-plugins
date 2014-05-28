@@ -7,7 +7,7 @@ the end (defaults to newline).
 
 - **Sticky**  
 Opens a window representation of the Diodon menu. The window will stay on top
-and reflect changes to the clipboard. Allows search clipboard items.
+and reflect changes to the clipboard. Allows searching and deleting clipboard items.
 
 ## Installing
 

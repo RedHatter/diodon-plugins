@@ -147,17 +147,18 @@ namespace Diodon.Plugins
 			var window = new Window ();
 			window.title = "Diodon";
 			window.window_position = WindowPosition.CENTER;
+			window.accept_focus = false;
 			window.set_keep_above (true);
-			var box = new Box (Orientation.VERTICAL, 0);
+			var box = new Grid ();
 			window.add (box);
-			build (box);
+			build (box, window);
 			controller.on_recent_menu_changed.connect ( (menu) =>
 				{
 					// Remove all widgets, then rebuild menu
 					var widgets = box.get_children ();
 					foreach (var widget in widgets)
 						box.remove (widget);
-					build (box);
+					build (box, window);
 					box.show_all ();
 				});
 			window.show_all ();
@@ -166,12 +167,13 @@ namespace Diodon.Plugins
 		/*
 		 * Insert items from recent menu as buttons.
 		 */
-		private void build (Box box)
+		private void build (Grid box, Window window)
 		{
 			debug ("build menu");
 			var menu = controller.get_recent_menu ();
 			var widgets = menu.get_children ();
 			bool stock = false; // Are we above or below separator?
+			var n = 0;
 			foreach (var widget in widgets)
 			{
 				if (widget is SeparatorMenuItem)
@@ -180,7 +182,7 @@ namespace Diodon.Plugins
 					var separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
 					separator.margin_left = 5;
 					separator.margin_right = 5;
-					box.add (separator);
+					box.attach (separator, 0, n, 1, 1);
 					stock = true;
 				} else
 				{
@@ -198,20 +200,28 @@ namespace Diodon.Plugins
 					button.xalign = 0.0f;
 					button.use_stock = stock;
 					button.clicked.connect ( () => item.activate ());
-					box.add (button);
+					box.attach (button, 0, n, 1, 1);
 				}
+				n++;
 			}
 
 			// Insert search box
 			var search = new Gtk.Entry ();
-			search.placeholder_text = "Search";
+			search.placeholder_text = "Double click to search";
 			search.margin = 10;
 			search.set_icon_from_icon_name (Gtk.EntryIconPosition.SECONDARY, "edit-clear");
 			search.icon_press.connect ((pos, event) => search.set_text (""));
+			search.button_press_event.connect ( (event) => 
+				{
+					window.accept_focus = true;
+					return false;
+				});
+			search.focus_out_event.connect ( (event) => window.accept_focus = false);
 			search.changed.connect ( () =>
 				{
+					debug ("change");
 					if (search.text == "")
-						build (box);
+						build (box, window);
 					else
 						// Do the search
 						controller.get_items_by_search_query.begin (search.text, null, ClipboardTimerange.ALL, null, (obj, res) =>
@@ -222,11 +232,17 @@ namespace Diodon.Plugins
 
 								// Remove clipboard items
 								for (var i = 0; i < size; i++)
-									box.remove (widget.nth_data (i));
+								{
+									box.remove (box.get_child_at (0, i));
+									var x = box.get_child_at (1, i);
+									if (x != null)
+										box.remove (x);
+								}
 
 								// Insert results
 								for (var i = 0; i < size; i++)
 								{
+									var j = i;
 									Button button;
 									if (i < items.size)
 									{
@@ -235,23 +251,48 @@ namespace Diodon.Plugins
 										button.always_show_image = true;
 										button.clicked.connect ( () =>
 											{
-												controller.select_item_by_checksum.begin (items[i].get_checksum());
-												build (box);
+												controller.select_item_by_checksum.begin (items[j].get_checksum());
+												build (box, window);
+											});
+
+										var del = new Button.with_label (" ");
+										del.relief = ReliefStyle.NONE;
+										del.clicked.connect ( () => controller.remove_item.begin (items[j]));
+										del.enter_notify_event.connect ((event) =>
+											{
+												del.label = "x";
+												return false;
+											});
+										del.leave_notify_event.connect ((event) =>
+											{
+												del.label = " ";
+												return false;
+											});
+										box.attach (del, 1, i, 1, 1);
+										button.enter_notify_event.connect ((event) =>
+											{
+												del.label = "x";
+												return false;
+											});
+										button.leave_notify_event.connect ((event) =>
+											{
+												del.label = " ";
+												return false;
 											});
 									} else
 										button = new Button.with_label (" "); // Pad with empty buttons
 
 									button.margin_left = 10;
-									button.margin_right = 10;
+									button.margin_right = 0;
 									button.relief = ReliefStyle.NONE;
 									button.xalign = 0.0f;
-									box.add (button);
-									box.reorder_child (button, i);
+									box.attach (button, 0, i, 1, 1);
+//									box.reorder_child (button, i);
 								}
 								box.show_all ();
 							});
 				});
-			box.add (search);
+			box.attach (search, 0, n+1, 1, 1);
 		}
 
 		/*
