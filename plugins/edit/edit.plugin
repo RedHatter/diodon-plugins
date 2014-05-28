@@ -1,0 +1,6 @@
+[Plugin]
+Module=edit
+Name=Edit
+Description=Edit the active clipboard item.
+Authors=RedHatter <_c_@mail.com>
+Copyright=Copyright © 2014 Christian Timothy Johnson

@@ -9,6 +9,9 @@ the end (defaults to newline).
 Opens a window representation of the Diodon menu. The window will stay on top
 and reflect changes to the clipboard. Allows searching and deleting clipboard items.
 
+- **Edit**  
+Prompts to edit the active item.
+
 ## Installing
 
 ``` bash

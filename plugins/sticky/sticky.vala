@@ -56,8 +56,7 @@ namespace Diodon.Plugins
 			controller = object as Controller;
 
 			// Register keybinding and create menu item
-			accelerator = settings.get_string ("accelerator");
-			bind_accelerator (accelerator);
+			bind_accelerator (settings.get_string ("accelerator"));
 			if (settings.get_boolean ("display"))
 				create_item ();
 
@@ -117,7 +116,7 @@ namespace Diodon.Plugins
 		 */
 		private void bind_accelerator (string new_accelerator)
 		{
-			debug ("bind_accelerator: %s", new_accelerator);
+			debug ("binding %s", new_accelerator);
 			var keybinding_manager = controller.get_keybinding_manager ();
 			if (accelerator != null) {
 				keybinding_manager.unbind (accelerator);

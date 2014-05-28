@@ -34,3 +34,4 @@ def configure(conf):
 def build(bld):
     bld.add_subdirs('plugins/paste-all')
     bld.add_subdirs('plugins/sticky')
+    bld.add_subdirs('plugins/edit')
