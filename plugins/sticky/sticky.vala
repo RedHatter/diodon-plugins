@@ -69,9 +69,8 @@ namespace Diodon.Plugins
 					destroy_item ();
 
 				string new_accelerator = settings.get_string ("accelerator");
-				if (new_accelerator != accelerator) {
+				if (new_accelerator != accelerator)
 					bind_accelerator (new_accelerator);
-				}
 			});
 		}
 
@@ -144,6 +143,7 @@ namespace Diodon.Plugins
 		private async void sticky ()
 		{
 			debug ("open sticky");
+
 			var window = new Window ();
 			window.title = "Diodon";
 			window.window_position = WindowPosition.CENTER;
@@ -201,6 +201,57 @@ namespace Diodon.Plugins
 					box.add (button);
 				}
 			}
+
+			// Insert search box
+			var search = new Gtk.Entry ();
+			search.placeholder_text = "Search";
+			search.margin = 10;
+			search.set_icon_from_icon_name (Gtk.EntryIconPosition.SECONDARY, "edit-clear");
+			search.icon_press.connect ((pos, event) => search.set_text (""));
+			search.changed.connect ( () =>
+				{
+					if (search.text == "")
+						build (box);
+					else
+						// Do the search
+						controller.get_items_by_search_query.begin (search.text, null, ClipboardTimerange.ALL, null, (obj, res) =>
+							{
+								var widget = box.get_children ();
+								var items = controller.get_items_by_search_query.end (res);
+								var size = controller.get_configuration ().recent_items_size;
+
+								// Remove clipboard items
+								for (var i = 0; i < size; i++)
+									box.remove (widget.nth_data (i));
+
+								// Insert results
+								for (var i = 0; i < size; i++)
+								{
+									Button button;
+									if (i < items.size)
+									{
+										button = new Button.with_label (items[i].get_label ());
+										button.image = items[i].get_image ();
+										button.always_show_image = true;
+										button.clicked.connect ( () =>
+											{
+												controller.select_item_by_checksum.begin (items[i].get_checksum());
+												build (box);
+											});
+									} else
+										button = new Button.with_label (" "); // Pad with empty buttons
+
+									button.margin_left = 10;
+									button.margin_right = 10;
+									button.relief = ReliefStyle.NONE;
+									button.xalign = 0.0f;
+									box.add (button);
+									box.reorder_child (button, i);
+								}
+								box.show_all ();
+							});
+				});
+			box.add (search);
 		}
 
 		/*
