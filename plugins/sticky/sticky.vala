@@ -146,7 +146,6 @@ namespace Diodon.Plugins
 			var window = new Window ();
 			window.title = "Diodon";
 			window.window_position = WindowPosition.CENTER;
-			window.accept_focus = false;
 			window.set_keep_above (true);
 			var box = new Grid ();
 			window.add (box);
@@ -206,16 +205,10 @@ namespace Diodon.Plugins
 
 			// Insert search box
 			var search = new Gtk.Entry ();
-			search.placeholder_text = "Double click to search";
+			search.placeholder_text = "Search";
 			search.margin = 10;
 			search.set_icon_from_icon_name (Gtk.EntryIconPosition.SECONDARY, "edit-clear");
 			search.icon_press.connect ((pos, event) => search.set_text (""));
-			search.button_press_event.connect ( (event) => 
-				{
-					window.accept_focus = true;
-					return false;
-				});
-			search.focus_out_event.connect ( (event) => window.accept_focus = false);
 			search.changed.connect ( () =>
 				{
 					debug ("change");
