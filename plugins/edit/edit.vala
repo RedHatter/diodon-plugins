@@ -147,17 +147,16 @@ namespace Diodon.Plugins
 
 			var item = (yield controller.get_recent_items ())[0];
 			var dialog = new Dialog.with_buttons ("Edit", null, DialogFlags.MODAL, "_OK", ResponseType.ACCEPT, "_Cancel", ResponseType.REJECT, null);
-			var entry = new Entry ();
-			entry.text = item.get_text ();
-			entry.activate.connect (() => dialog.response (ResponseType.ACCEPT));
-			dialog.get_content_area ().add (entry);
+			var text_view = new TextView ();
+			text_view.buffer.text = item.get_text ();
+			dialog.get_content_area ().add (text_view);
 			dialog.response.connect ((id) =>
 				{
 					switch (id)
 					{
 						case ResponseType.ACCEPT:
 							controller.remove_item.begin (item);
-							controller.add_text_item.begin (item.get_clipboard_type (), entry.text, item.get_origin ());
+							controller.add_text_item.begin (item.get_clipboard_type (), text_view.buffer.text, item.get_origin ());
 							dialog.destroy ();
 							break;
 						case ResponseType.REJECT:
@@ -178,10 +177,10 @@ namespace Diodon.Plugins
 
 			var box = new Grid ();
 			box.attach (new Label ("Edit Key"), 0, 0, 1, 1);
-			var accel_entry = new Entry ();
-			accel_entry.set_text (accelerator);
-			accel_entry.focus_out_event.connect ( () => settings.set_string ("accelerator", accel_entry.get_text ()));
-			box.attach (accel_entry, 1, 0, 1, 1);
+			var accel_text_view = new Entry ();
+			accel_text_view.set_text (accelerator);
+			accel_text_view.focus_out_event.connect ( () => settings.set_string ("accelerator", accel_text_view.get_text ()));
+			box.attach (accel_text_view, 1, 0, 1, 1);
 
 			var check = new CheckButton.with_label ("Display in menu");
 			check.active = settings.get_boolean ("display");
