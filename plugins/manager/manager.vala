@@ -143,8 +143,9 @@ namespace Diodon.Plugins
 		 */
 		private void manager ()
 		{
-			debug ("open sticky");
+			debug ("open manager");
 
+			// Create Window
 			var window = new Window ();
 			window.title = "Diodon";
 			window.window_position = WindowPosition.CENTER;
@@ -152,17 +153,30 @@ namespace Diodon.Plugins
 			var box = new Box (Gtk.Orientation.VERTICAL, 10);
 			window.add (box);
 
+			// Create multi-select
 			var model = new ListStore (2, typeof (string), typeof (IClipboardItem));
 
 			reset.begin (model);
-			controller.on_recent_menu_changed.connect ((menu) => reset.begin(model));
+			controller.on_recent_menu_changed.connect ((menu) => reset.begin(model)); // Update when menu changes
 
 			var select = new TreeView.with_model (model);
 			select.headers_visible = false;
+			select.enable_search = false;
 			select.get_selection().mode = SelectionMode.MULTIPLE;
 			select.insert_column_with_attributes (-1, null, new CellRendererText (), "text", 0);
+			select.row_activated.connect ( (path, column) => // Double-click to set item as active
+				{
+					select.get_selection ().selected_foreach ( (l_model, l_path, iter)  =>
+					{
+						IClipboardItem item = null;
+						l_model.get (iter, 1, out item);
+						controller.select_item_by_checksum.begin (item.get_checksum ());
+					});
+				});
 			box.add (select);
 
+
+			// Create buttons
 			var buttons = new Box (Gtk.Orientation.HORIZONTAL, 0);
 			var button = new Button.with_label ("Select");
 			button.margin = 5;
@@ -172,6 +186,7 @@ namespace Diodon.Plugins
 
 					select.get_selection ().selected_foreach ( (l_model, path, iter)  =>
 					{
+						l_model.get (iter, 1, out item);
 						controller.select_item_by_checksum.begin (item.get_checksum ());
 					});
 				});
@@ -193,7 +208,7 @@ namespace Diodon.Plugins
 
 			button = new Button.with_label ("Edit");
 			button.margin = 5;
-			button.clicked.connect (() =>
+			button.clicked.connect (() => // Code pulled from  the 'Edit' plugin
 				{
 					IClipboardItem item = null;
 
@@ -224,6 +239,7 @@ namespace Diodon.Plugins
 				});
 			buttons.add (button);
 
+			// Not very useful, but why not
 			button = new Button.with_label ("New");
 			button.margin = 5;
 			button.clicked.connect (() =>
@@ -249,7 +265,8 @@ namespace Diodon.Plugins
 				});
 			buttons.add (button);
 
-			button = new Button.with_label ("Combine");
+			// Works the same as 'Paste All' plugin
+			button = new Button.with_label ("Merge");
 			button.margin = 5;
 			button.clicked.connect (() =>
 				{
@@ -267,6 +284,7 @@ namespace Diodon.Plugins
 
 			box.add (buttons);
 
+			// Create other buttons from menu items
 			var menu = controller.get_recent_menu ();
 			var widgets = menu.get_children ();
 			bool insert = false; // Are we above or below separator?
@@ -282,23 +300,25 @@ namespace Diodon.Plugins
 					insert = true;
 				} else if (insert)
 				{
-					var item = widget as Gtk.MenuItem;
-					if (item.label == "Open Manager") // Manager is open, no need to open another
+					var menu_item = widget as Gtk.MenuItem;
+					if (menu_item.label == "Open Manager") // Manager is open, no need to open another
 						continue;
 
 					// Create button from item
-					button = new Button.with_label (item.label);
+					button = new Button.with_label (menu_item.label);
 					button.margin_left = 10;
 					button.margin_right = 10;
 					button.relief = ReliefStyle.NONE;
+					button.always_show_image = true;
+					button.use_stock = true;
 					button.xalign = 0.0f;
 					button.use_stock = true;
-					button.clicked.connect ( () => item.activate ());
+					button.clicked.connect ( () => menu_item.activate ());
 					box.add (button);
 				}
 			}
 
-			// Insert search box
+			// Create search box
 			var search = new Entry ();
 			search.placeholder_text = "Search";
 			search.margin = 10;
@@ -325,10 +345,12 @@ namespace Diodon.Plugins
 				});
 			box.add (search);
 
-
 			window.show_all ();
 		}
 
+		/*
+		 * Clear select, then populate from reacent items.
+		 */
 		private async void reset (ListStore model)
 		{
 			TreeIter iter;
