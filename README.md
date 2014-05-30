@@ -1,6 +1,9 @@
 # Diodon Plugins
 This is a set of plugins for the gnome clipboard manager Diodon.
 
+- **Manager**  
+A more complex version of Sticky. Opens a window where you can create new items, search the entire list, edit or delete existing items, and merge multiple items together.
+
 - **Paste All**  
 Simple plugin to paste all recent items at once, optionally appending a string to
 the end (defaults to newline).
