@@ -62,16 +62,16 @@ namespace Diodon.Plugins
 				create_item ();
 
 			// Watch for changes in Preferences
-			settings.changed.connect ( (key) => {
+			settings.changed.connect ( () =>
+			{
 				if (settings.get_boolean ("display"))
 					create_item ();
 				else
 					destroy_item ();
 
 				string new_accelerator = settings.get_string ("accelerator");
-				if (new_accelerator != accelerator) {
+				if (new_accelerator != accelerator)
 					bind_accelerator (new_accelerator);
-				}
 			});
 		}
 
@@ -162,11 +162,12 @@ namespace Diodon.Plugins
 			var select = new TreeView.with_model (model);
 			select.headers_visible = false;
 			select.enable_search = false;
+			select.fixed_height_mode = true;
 			select.get_selection().mode = SelectionMode.MULTIPLE;
 			select.insert_column_with_attributes (-1, null, new CellRendererText (), "text", 0);
-			select.row_activated.connect ( (path, column) => // Double-click to set item as active
+			select.row_activated.connect ( () => // Double-click to set item as active
 				{
-					select.get_selection ().selected_foreach ( (l_model, l_path, iter)  =>
+					select.get_selection ().selected_foreach ( (l_model, path, iter)  =>
 					{
 						IClipboardItem item = null;
 						l_model.get (iter, 1, out item);
@@ -187,7 +188,8 @@ namespace Diodon.Plugins
 					select.get_selection ().selected_foreach ( (l_model, path, iter)  =>
 					{
 						l_model.get (iter, 1, out item);
-						controller.select_item_by_checksum.begin (item.get_checksum ());
+						if (item != null)
+							controller.select_item_by_checksum.begin (item.get_checksum ());
 					});
 				});
 			buttons.add (button);
@@ -201,7 +203,8 @@ namespace Diodon.Plugins
 					select.get_selection ().selected_foreach ( (l_model, path, iter)  =>
 					{
 						l_model.get (iter, 1, out item);
-						controller.remove_item.begin (item);
+						if (item != null)
+							controller.remove_item.begin (item);
 					});
 				});
 			buttons.add (button);
@@ -215,6 +218,9 @@ namespace Diodon.Plugins
 					select.get_selection ().selected_foreach ( (l_model, path, iter)  =>
 					{
 						l_model.get (iter, 1, out item);
+						if (item == null)
+							return;
+
 						var dialog = new Dialog.with_buttons ("Edit", null, DialogFlags.MODAL, "_OK", ResponseType.ACCEPT, "_Cancel", ResponseType.REJECT, null);
 						var text_view = new TextView ();
 						text_view.buffer.text = item.get_text ();
@@ -276,7 +282,8 @@ namespace Diodon.Plugins
 					select.get_selection ().selected_foreach ( (l_model, path, iter)  =>
 					{
 						l_model.get (iter, 1, out item);
-						text += item.get_text ();
+						if (item != null)
+							text += item.get_text ();
 					});
 					controller.add_text_item.begin (ClipboardType.NONE, text, null);
 				});
@@ -323,12 +330,14 @@ namespace Diodon.Plugins
 			search.placeholder_text = "Search";
 			search.margin = 10;
 			search.set_icon_from_icon_name (Gtk.EntryIconPosition.SECONDARY, "edit-clear");
-			search.icon_press.connect ((pos, event) => search.set_text (""));
+			search.icon_press.connect (() => search.set_text (""));
 			search.changed.connect ( () =>
 				{
 					if (search.text == "")
+					{
 						reset.begin (model);
-					else
+						window.resize (1, 1);
+					} else
 						// Do the search
 						controller.get_items_by_search_query.begin (search.text, null, ClipboardTimerange.ALL, null, (obj, res) =>
 							{
@@ -341,6 +350,13 @@ namespace Diodon.Plugins
 									model.append (out iter);
 									model.set (iter, 0, item.get_label (), 1, item);
 								}
+
+								if (items.size < 1)
+								{
+									model.append (out iter);
+									model.set (iter, 0, "<No results>");
+								}
+								window.resize (1, 1);
 							});
 				});
 			box.add (search);
