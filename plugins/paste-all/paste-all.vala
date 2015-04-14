@@ -59,58 +59,11 @@ namespace Diodon.Plugins
 			bind_accelerator (accelerator);
 			append = settings.get_string ("append");
 			if (settings.get_boolean ("display"))
-				create_item ();
-
-			// Watch for changes in Preferences
-			settings.changed.connect ( (key) => {
-				append = settings.get_string ("append");
-				if (settings.get_boolean ("display"))
-					create_item ();
-				else
-					destroy_item ();
-
-				string new_accelerator = settings.get_string ("accelerator");
-				if (new_accelerator != accelerator) {
-					bind_accelerator (new_accelerator);
-				}
-			});
-		}
-
-		/*
-		 * Create Paste All item to add to menu.
-		 */
-		private void create_item ()
-		{
-			if (item != null)
-				return;
-
-			debug ("create item");
-
-			item = new Gtk.MenuItem.with_label ("Paste All");
-			item.activate.connect ( () => paste_all.begin ());
-			add_item (controller.get_recent_menu ());
-			controller.on_recent_menu_changed.connect (add_item);
-		}
-
-		/*
-		 * Insert item into menu.
-		 */
-		private void add_item (Gtk.Menu menu)
-		{
-				menu.insert (item, controller.get_configuration ().recent_items_size + 1);
-				item.show ();			
-		}
-
-		/*
-		 * Remove item from menu.
-		 */
-		private void destroy_item ()
-		{
-			debug ("destroy item");
-
-			controller.on_recent_menu_changed.disconnect (add_item);
-			controller.get_recent_menu ().remove (item);
-			item = null;
+			{
+				item = new Gtk.MenuItem.with_label ("Paste All");
+				item.activate.connect ( () => paste_all.begin ());
+				controller.add_static_recent_menu_item (item);
+			}
 		}
 
 		public void deactivate ()
@@ -118,7 +71,8 @@ namespace Diodon.Plugins
 			debug ("deactivate");
 			
 			controller.get_keybinding_manager ().unbind (accelerator);
-			destroy_item ();
+			if (item != null)
+				controller.remove_static_recent_menu_item (item);
 		}
 
 		public void update_state () {}
