@@ -60,7 +60,7 @@ namespace Diodon.Plugins
 			if (settings.get_boolean ("display"))
 			{
 				item = new Gtk.MenuItem.with_label ("Open Sticky");
-				item.activate.connect ( () => paste_all.begin ());
+				item.activate.connect ( () => sticky.begin ());
 				controller.add_static_recent_menu_item (item);
 			}
 		}
