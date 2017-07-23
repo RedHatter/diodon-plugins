@@ -1,0 +1,6 @@
+[Plugin]
+Module=pop
+Name=Pop Item
+Description=Pastes and then removes the active clipboard item.
+Authors=Timothy Johnson <timothy@idioticdev.com>
+Copyright=Copyright © 2017 Timothy Johnson

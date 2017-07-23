@@ -1,0 +1,21 @@
+#! /usr/bin/env python
+# encoding: utf-8
+
+import os
+
+lib = bld.shlib(
+  vala_defines=['DEBUG'],
+  features='c cshlib',
+  target='pop',
+  vapi_dirs='../../vapi',
+  uselib='DIODON PEAS PEASGTK',
+  install_binding=False,
+  packages='diodon libpeas-1.0 libpeas-gtk-1.0',
+  source=bld.path.ant_glob(incl='**/*.vala'))
+
+lib.install_path = os.path.join(bld.env['PLUGINS_DIR'], lib.target)
+
+bld.install_files(lib.install_path, 'pop.plugin')
+
+# task = bld.new_task_gen(features = 'glib2')
+# task.add_settings_schemas('net.launchpad.Diodon.Pop.gschema.xml')

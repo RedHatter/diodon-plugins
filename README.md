@@ -1,6 +1,9 @@
 # Diodon Plugins
 This is a set of plugins for the gnome clipboard manager Diodon.
 
+- **Pop Item**
+Pastes and then removes the active clipboard item.
+
 - **Manager**  
 A more complex version of Sticky. Opens a window where, in addition to selecting an item to paste, you can create new items, search the entire list, edit or delete existing items, and merge multiple items together.
 
