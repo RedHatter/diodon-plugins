@@ -1,6 +1,9 @@
 # Diodon Plugins
 This is a set of plugins for the gnome clipboard manager Diodon.
 
+- **Numbers**
+Number clipboard menu items.
+
 - **Pop Item**
 Pastes and then removes the active clipboard item.
 

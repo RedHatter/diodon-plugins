@@ -1,0 +1,6 @@
+[Plugin]
+Module=numbers
+Name=Numbers
+Description=Number clipboard menu items.
+Authors=Timothy Jonson <timothy@idioticdev.com>
+Copyright=Copyright © 2017 Timothy Jonson <timothy@idioticdev.com>
