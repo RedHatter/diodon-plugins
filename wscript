@@ -23,7 +23,7 @@ def configure(conf):
 
     conf.check_vala(min_version=(0, 16, 0))
 
-    conf.check_cfg(package='diodon',      uselib_store='DIODON', atleast_version='1.0.0', mandatory=1, args='--cflags --libs')
+    conf.check_cfg(package='diodon',      uselib_store='DIODON', atleast_version='1.6.0', mandatory=1, args='--cflags --libs')
     conf.check_cfg(package='libpeas-1.0', uselib_store='PEAS',   atleast_version='1.1.0', mandatory=1, args='--cflags --libs')
     conf.check_cfg(package='libpeas-gtk-1.0', uselib_store='PEASGTK',   atleast_version='1.1.0', mandatory=1, args='--cflags --libs')
 
@@ -33,6 +33,10 @@ def configure(conf):
 
 def build(bld):
     bld.add_subdirs('plugins/paste-all')
-    bld.add_subdirs('plugins/sticky')
-    bld.add_subdirs('plugins/manager')
     bld.add_subdirs('plugins/edit')
+    bld.add_subdirs('plugins/features')
+    bld.add_subdirs('plugins/actions')
+    bld.add_subdirs('plugins/numbers')
+    bld.add_subdirs('plugins/alternative')
+    bld.add_subdirs('plugins/pop')
+    bld.add_subdirs('plugins/dbus-controller')

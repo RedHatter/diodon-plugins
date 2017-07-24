@@ -1,6 +1,0 @@
-[Plugin]
-Module=manager
-Name=Manager
-Description=Delete, edit, insert, combine, and search clipboard items.
-Authors=RedHatter <_c_@mail.com>
-Copyright=Copyright © 2014 Christian Timothy Johnson
