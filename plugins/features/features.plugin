@@ -1,0 +1,6 @@
+[Plugin]
+Module=features
+Name=Features
+Description=Additional features for the diodon menu. 
+Authors=Timothy Johnson <timothy@idioticdev.com>
+Copyright=Copyright © 2017 Timothy Johnson <timothy@idioticdev.com>

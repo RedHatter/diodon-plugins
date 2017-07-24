@@ -1,0 +1,7 @@
+<schemalist>
+  <schema id="com.diodon.plugins.features" path="/com/diodon/plugins/features/" gettext-domain="features">
+    <key name="pinned" type="as">
+      <default>[]</default>
+    </key>
+  </schema>
+</schemalist>
