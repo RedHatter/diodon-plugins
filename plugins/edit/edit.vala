@@ -28,6 +28,7 @@ namespace Diodon.Plugins
 	public class EditPlugin : Peas.ExtensionBase, Peas.Activatable
 	{
 		private Controller controller;
+		private Gtk.MenuItem menuitem;
 
 		public Object object { get; construct; }
 
@@ -40,28 +41,16 @@ namespace Diodon.Plugins
 		{
 			controller = object as Controller;
 
-			var item = new Gtk.MenuItem.with_label ("Edit");
-			item.activate.connect (() => edit.begin ());
-			controller.add_static_recent_menu_item.begin (item);
-
-			item = new Gtk.MenuItem.with_label ("Delete");
-			item.activate.connect (() => delete.begin ());
-			controller.add_static_recent_menu_item.begin (item);
+			menuitem = new Gtk.MenuItem.with_label ("Edit");
+			menuitem.activate.connect (() => edit.begin ());
+			controller.add_static_recent_menu_item.begin (menuitem);
 		}
 
-		public void deactivate () {}
+		public void deactivate () {
+			menuitem.destory();
+		}
 
 		public void update_state () {}
-
-		/**
-		 * Delete active clipboard item.
-		 */
-		private async void delete ()
-		{
-			yield controller.remove_item (
-				(yield controller.get_recent_items ())[0]);
-			controller.rebuild_recent_menu.begin ();
-		}
 
 		/**
 		 * Edit active clipboard item.
