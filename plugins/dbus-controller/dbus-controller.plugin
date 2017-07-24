@@ -1,0 +1,6 @@
+[Plugin]
+Module=dbus-controller
+Name=DBus Controller
+Description=Exposes Diodon api as a DBus service.
+Authors=Timothy Johnson <timothy@idioticdev.com>
+Copyright=Copyright © 2017 Timothy Johnson

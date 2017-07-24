@@ -1,6 +1,9 @@
 # Diodon Plugins
 This is a set of plugins for the gnome clipboard manager Diodon.
 
+- **DBus Controller**  
+Exposes Diodon api as a DBus service.
+
 - **Features**  
 Additional features for the diodon menu.
   - Edit items
