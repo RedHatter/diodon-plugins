@@ -16,6 +16,3 @@ lib = bld.shlib(
 lib.install_path = os.path.join(bld.env['PLUGINS_DIR'], lib.target)
 
 bld.install_files(lib.install_path, 'edit.plugin')
-
-task = bld.new_task_gen(features = 'glib2')
-task.add_settings_schemas('net.launchpad.Diodon.Edit.gschema.xml')
