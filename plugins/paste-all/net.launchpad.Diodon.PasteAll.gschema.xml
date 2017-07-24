@@ -1,20 +1,10 @@
 <schemalist>
   <schema id="com.diodon.plugins.paste-all" path="/com/diodon/plugins/paste-all/" gettext-domain="paste-all">
-    <key name="accelerator" type="s">
-      <default>""</default>
-      <summary>Paste All Key</summary>
-      <description>The string representing the keybinding to paste all recent items.</description>
-    </key>
     <key name="append" type="s">
       <default>"
 "</default>
       <summary>Append</summary>
       <description>The string to append to each recent item before pasting.</description>
-    </key>
-    <key name="display" type="b">
-      <default>true</default>
-      <summary>Display item in menu.</summary>
-      <description>Display menu item to paste all recent items in the Diodon menu.</description>
     </key>
   </schema>
 </schemalist>
