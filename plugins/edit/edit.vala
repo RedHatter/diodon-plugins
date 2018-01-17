@@ -47,7 +47,7 @@ namespace Diodon.Plugins
 		}
 
 		public void deactivate () {
-			menuitem.destory();
+			menuitem.destroy();
 		}
 
 		public void update_state () {}
