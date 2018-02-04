@@ -83,7 +83,6 @@ namespace Diodon.Plugins
 			var temp = new TextClipboardItem (ClipboardType.NONE, text, null,  new DateTime.now_utc ());
 			yield controller.add_item (temp);
 			yield controller.select_item (temp);
-			controller.execute_paste (temp);
 			yield controller.remove_item (temp);
 
 		}

@@ -110,9 +110,10 @@ namespace Diodon.Plugins
 			var timerange = date_copied != "" ? ClipboardTimerange.from_string(date_copied) : ClipboardTimerange.ALL;
 
 			var recentItems = yield controller.get_recent_items(clipboardCategories, timerange);
-			var array = new GLib.HashTable<string,string>[recentItems.size];
-			for (var i = 0; i < recentItems.size; i++)
-				array[i] = item_to_dictionary(recentItems[i]);
+			var array = new GLib.HashTable<string,string>[recentItems.length()];
+			var i = 0;
+			for (weak List<IClipboardItem> node = recentItems; node != null; node = node.next)
+				array[i++] = item_to_dictionary(node.data);
 
 			return array;
 		}
@@ -126,9 +127,10 @@ namespace Diodon.Plugins
 			var timerange = date_copied != "" ? ClipboardTimerange.from_string(date_copied) : ClipboardTimerange.ALL;
 
 			var recentItems = yield controller.get_items_by_search_query(search_query, clipboardCategories, timerange);
-			var array = new GLib.HashTable<string,string>[recentItems.size];
-			for (var i = 0; i < recentItems.size; i++)
-				array[i] = item_to_dictionary(recentItems[i]);
+			var array = new GLib.HashTable<string,string>[recentItems.length()];
+			var i = 0;
+			for (weak List<IClipboardItem> node = recentItems; node != null; node = node.next)
+				array[i++] = item_to_dictionary(node.data);
 
 			return array;
 		}

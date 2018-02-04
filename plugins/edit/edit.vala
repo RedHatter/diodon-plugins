@@ -41,7 +41,7 @@ namespace Diodon.Plugins
 		{
 			controller = object as Controller;
 
-			menuitem = new Gtk.MenuItem.with_label ("Edit");
+			menuitem = new Gtk.MenuItem.with_label ("Edit active item");
 			menuitem.activate.connect (() => edit.begin ());
 			controller.add_static_recent_menu_item.begin (menuitem);
 		}
@@ -57,9 +57,13 @@ namespace Diodon.Plugins
 		 */
 		private async void edit ()
 		{
-			var item = (yield controller.get_recent_items ())[0];
+			var item = (yield controller.get_recent_items ()).data;
 			var dialog = new Dialog.with_buttons ("Edit", null, DialogFlags.MODAL, "_OK", ResponseType.ACCEPT, "_Cancel", ResponseType.REJECT, null);
 			var text_view = new TextView ();
+			text_view.top_margin = 20;
+			text_view.right_margin = 20;
+			text_view.bottom_margin = 20;
+			text_view.left_margin = 20;
 			text_view.buffer.text = item.get_text ();
 			dialog.get_content_area ().add (text_view);
 			dialog.response.connect ((id) =>

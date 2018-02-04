@@ -2,24 +2,24 @@ using Gtk;
 
 namespace Diodon.Plugins
 {
-	public class Filter : Gtk.ImageMenuItem
+	public class Filter : Object
 	{
+		private Gtk.ImageMenuItem item;
+		private Gtk.Menu menu;
+
 		private string filter;
 		private Label label;
-		private FeaturesPlugin features;
+		private Controller controller;
+		private PinnedItems pinned_items;
 
-		public Filter (FeaturesPlugin features)
+		public Filter (Controller controller, PinnedItems pinned_items)
 		{
-			this.features = features;
+			this.controller = controller;
+			this.pinned_items = pinned_items;
 			filter = "";
-			
-			sensitive = false;
-
 			label = new Label ("<i>Type to start searching</i>");
 			label.use_markup = true;
 			label.halign = Align.CENTER;
-			add (label);
-			label.show ();
 		}
 
 		public void clear ()
@@ -28,7 +28,7 @@ namespace Diodon.Plugins
 				return;
 
 			filter = "";
-			filter_menu.begin ();
+			patch.begin (menu);
 		}
 
 		/**
@@ -39,7 +39,7 @@ namespace Diodon.Plugins
 			switch (event.keyval)
 			{
 				case 65307: // ESC
-					features.controller.get_recent_menu ().popdown ();
+					menu.popdown ();
 					return true;
 				case 65535: // Delete
 					filter = "";
@@ -53,9 +53,8 @@ namespace Diodon.Plugins
 				case 65364: // Down
 					return false;
 				case 65293: // Enter
-					var menu = features.controller.get_recent_menu ();
 					if (menu.get_selected_item () == null)
-						((Gtk.MenuItem) menu.get_children ().nth_data (0)).enter_notify_event (null);
+						((Gtk.MenuItem) menu.get_children ().data).enter_notify_event (null);
 
 					return false;
 				default:
@@ -66,7 +65,7 @@ namespace Diodon.Plugins
 					break;
 			}
 
-			filter_menu.begin ();
+			patch.begin (menu);
 
 			return true;
 		}
@@ -74,36 +73,65 @@ namespace Diodon.Plugins
 		/**
 		 * Display items matching filter instead of most resent.
 		 */
-		private async void filter_menu ()
+		public async int patch (Gtk.Menu menu)
 		{
+			this.menu = menu;
+			List<Diodon.IClipboardItem> items;
+
 			if (filter == "")
 			{
-				features.process_menu.begin (features.controller.get_recent_menu ());
-				return;
+				label.label = "<i>Type to start searching</i>";
+				items = yield controller.get_recent_items ();
+			} else {
+				label.label = "<i>Searching</i> — " + filter;
+				items = yield controller.get_items_by_search_query (filter);
 			}
-
-			label.label = "<i>Searching</i> — " + filter;
 
 			// Replace items
-			var menu = features.controller.get_recent_menu ();
-			var list = menu.get_children ();
-			var items = yield features.controller.get_items_by_search_query (filter);
-			var i = -1;
-			for (i = 0; i < list.length (); i++)
+			var max = controller.get_configuration().recent_items_size;
+			var menuItems = menu.get_children ();
+
+			var i = 0;
+			weak List<Diodon.IClipboardItem> itemNode = items;
+			weak List<weak Widget> menuNode = menuItems;
+			do
 			{
-				if (list.nth_data (i) == this)
-					break;
+				if (itemNode != null && i < max)
+				{
+					menu.insert (new ClipboardMenuItem (itemNode.data, controller,  pinned_items), i);
+					itemNode = itemNode.next;
+				} else {
+					itemNode = null;
+				}
 
-				if (i < items.size)
-					menu.insert (new ClipboardMenuItem (items[i], features), i);
+				if (menuNode != null && menuNode.data != item
+					&& !(menuNode.data is SeparatorMenuItem))
+				{
+					menu.remove (menuNode.data);
+					menuNode = menuNode.next;
+				} else
+				{
+					menuNode = null;
+				}
 
-				menu.remove (list.nth_data (i));
+				i++;
+			} while (itemNode != null || menuNode != null);
+
+			if (item == null)
+			{
+				item = new Gtk.ImageMenuItem();
+				item.sensitive = false;
+				item.add (label);
+				label.show ();
+
+				menu.insert (item, i - 1);
+				i++;
+				item.show ();
+				menu.key_press_event.connect (this.key_press_event);
+				menu.hide.connect (this.clear);
 			}
 
-			for (; i < items.size && i < 25; i++)
-				menu.insert (new ClipboardMenuItem (items[i], features), i);
+			return i;
 		}
-
-
 	}
 }

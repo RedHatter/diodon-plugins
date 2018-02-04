@@ -29,20 +29,10 @@ namespace Diodon.Plugins
 	 */
 	public class FeaturesPlugin : Peas.ExtensionBase, Peas.Activatable
 	{
+		private PinnedItems pinned_items;
+		private Filter filter;
+
 		public Controller controller;
-		public Gee.List<string> pinned_items;
-
-		private GLib.Settings _settings;
-		private GLib.Settings settings
-		{
-			get
-			{
-				if (_settings == null)
-					_settings = new GLib.Settings ("com.diodon.plugins.features");
-
-				return _settings;
-			}
-		}
 
 		public Object object { get; construct; }
 
@@ -55,8 +45,8 @@ namespace Diodon.Plugins
 		{
 			controller = object as Controller;
 
-			// Load pinned items
-			pinned_items = new Gee.ArrayList<string>.wrap (settings.get_strv ("pinned"));
+			pinned_items = new PinnedItems(controller);
+			filter = new Filter(controller, pinned_items);
 
 			// Rebuild the menu
 			process_menu.begin (controller.get_recent_menu ());
@@ -71,66 +61,12 @@ namespace Diodon.Plugins
 		 */
 		public async void process_menu (Gtk.Menu menu)
 		{
-			// Find last separator
-			var list = menu.get_children ();
-			var i = 0;
-			for (i = (int) list.length ()-1; i >= 0; i--)
-				if (list.nth_data (i) is SeparatorMenuItem)
-					break;
-
-			// Remove items
-			for (i--; i >= 0; i--)
-				menu.remove (list.nth_data (i));
-
-			// Insert pinned menu items
-			for (i = 0; i < pinned_items.size; i++)
-			{
-				var item = yield controller.get_item_by_checksum (pinned_items[i]);
-				if (item == null)
-				{
-					pinned_items.remove_at (i--);
-					continue;
-				}
-
-				menu.prepend (new ClipboardMenuItem (item, this));
-			}
-
-			save_pinned_items ();
-
-			if (pinned_items.size > 0)
-			{
-				var item = new SeparatorMenuItem ();
-				item.show ();
-				menu.prepend (item);
-			}
-
-			var filter = new Filter (this);
-			menu.prepend (filter);
-			filter.show ();
-			menu.key_press_event.connect (filter.key_press_event);
-			menu.hide.connect (filter.clear);
-
-			// Create and insert new menu items
-			var items = yield controller.get_recent_items ();
-			for (i = items.size-1; i >= 0; i--)
-				menu.prepend (new ClipboardMenuItem (items[i], this));
-		}
-
-		/**
-		 * Save pinned item checksums to settings.
-		 */
-		public void save_pinned_items ()
-		{
-			// Collection.to_array () causes seg fault
-			var array = new string[pinned_items.size];
-			for (var i = 0; i < pinned_items.size; i++)
-				array[i] = pinned_items[i];
-
-			settings.set_strv ("pinned", array);
+			var i = yield filter.patch(menu);
+			yield pinned_items.patch(menu, i);
 		}
 
 		public void deactivate () {
-			controller.rebuild_recent_menu();
+			controller.rebuild_recent_menu.begin();
 		}
 
 		public void update_state () {}

@@ -52,9 +52,9 @@ namespace Diodon.Plugins
 
 		private async void pop ()
 		{
-			var items = yield controller.get_recent_items ();
-			yield controller.select_item (items[0]);
-			yield controller.remove_item (items[0]);
+			var item = (yield controller.get_recent_items ()).data;
+			yield controller.select_item (item);
+			yield controller.remove_item (item);
 			yield controller.rebuild_recent_menu ();
 		}
 
