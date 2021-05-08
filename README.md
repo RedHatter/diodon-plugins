@@ -35,6 +35,9 @@ sudo ./waf install
 sudo update-icon-caches /usr/share/icons/hicolor/
 ```
 
+If you get the error “RuntimeError: generator raised StopIteration” please 
+try putting `python2` before each call to `./waf` in the steps above.
+
 ## Debuging
 
 ``` bash
