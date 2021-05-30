@@ -35,8 +35,6 @@ def build(bld):
     bld.add_subdirs('plugins/paste-all')
     bld.add_subdirs('plugins/edit')
     bld.add_subdirs('plugins/features')
-    bld.add_subdirs('plugins/actions')
     bld.add_subdirs('plugins/numbers')
-    bld.add_subdirs('plugins/alternative')
     bld.add_subdirs('plugins/pop')
     bld.add_subdirs('plugins/dbus-controller')
