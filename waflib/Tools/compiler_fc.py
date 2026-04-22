@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-import os, sys, imp, types
+import os, sys, types
 from waflib import Utils, Configure, Options, Logs, Errors
 from waflib.Tools import fc
 

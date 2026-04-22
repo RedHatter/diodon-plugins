@@ -37,6 +37,9 @@ def process_marshal(self):
 	Process the marshal files stored in the attribute *marshal_list* to create :py:class:`waflib.Tools.glib2.glib_genmarshal` instances.
 	Add the c file created to the list of source to process.
 	"""
+	if getattr(self, 'marshal_list', []) and not self.env['GLIB_GENMARSHAL']:
+		raise Errors.WafError('Unable to process marshal files - glib-genmarshal was not found during configure')
+
 	for f, prefix in getattr(self, 'marshal_list', []):
 		node = self.path.find_resource(f)
 
@@ -156,6 +159,9 @@ def process_enums(self):
 	"""
 	Process the enum files stored in the attribute *enum_list* to create :py:class:`waflib.Tools.glib2.glib_mkenums` instances.
 	"""
+	if getattr(self, 'enums_list', []) and not self.env['GLIB_MKENUMS']:
+		raise Errors.WafError('Unable to process enum files - glib-mkenums was not found during configure')
+
 	for enum in getattr(self, 'enums_list', []):
 		task = self.create_task('glib_mkenums')
 		env = task.env
@@ -274,6 +280,8 @@ def process_settings(self):
 	settings_schema_files = getattr(self, 'settings_schema_files', [])
 	if settings_schema_files and not self.env['GLIB_COMPILE_SCHEMAS']:
 		raise Errors.WafError ("Unable to process GSettings schemas - glib-compile-schemas was not found during configure")
+	if hasattr(self, 'settings_enum_files') and not self.env['GLIB_MKENUMS']:
+		raise Errors.WafError('Unable to process GSettings enums - glib-mkenums was not found during configure')
 
 	# 1. process gsettings_enum_files (generate .enums.xml)
 	#
@@ -349,8 +357,15 @@ def configure(conf):
 
 	And set the variable *GSETTINGSSCHEMADIR*
 	"""
-	conf.find_program('glib-genmarshal', var='GLIB_GENMARSHAL')
-	conf.find_perl_program('glib-mkenums', var='GLIB_MKENUMS')
+	try:
+		conf.find_program('glib-genmarshal', var='GLIB_GENMARSHAL')
+	except Errors.ConfigurationError:
+		conf.env['GLIB_GENMARSHAL'] = []
+
+	try:
+		conf.find_perl_program('glib-mkenums', var='GLIB_MKENUMS')
+	except Errors.ConfigurationError:
+		conf.env['GLIB_MKENUMS'] = []
 
 	# when cross-compiling, gsettings.m4 locates the program with the following:
 	#   pkg-config --variable glib_compile_schemas gio-2.0

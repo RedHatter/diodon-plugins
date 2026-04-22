@@ -29,7 +29,7 @@ Not all compilers need to have a specific tool. For example, the clang compilers
 	$ CC=clang waf configure
 """
 
-import os, sys, imp, types
+import os, sys, types
 from waflib.Tools import ccroot
 from waflib import Utils, Configure
 from waflib.Logs import debug

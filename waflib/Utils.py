@@ -133,6 +133,8 @@ def readf(fname, m='r'):
 	:rtype: string
 	:return: Content of the file
 	"""
+	if 'U' in m:
+		m = m.replace('U', '') or 'r'
 	f = open(fname, m)
 	try:
 		txt = f.read()
