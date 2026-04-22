@@ -26,17 +26,27 @@ Prompts to edit the active item.
 
 ## Installing
 
+Build requirements:
+
+- Python 3
+- pkg-config
+- valac
+- glib-compile-schemas
+- Diodon development files (must provide the `diodon` pkg-config module)
+- libpeas 1.0 development files
+- libpeas-gtk 1.0 development files
+
 ``` bash
 git clone https://github.com/RedHatter/diodon-plugins.git
 cd diodon-plugins
+./waf --help
 ./waf configure --libdir /usr/lib/x86_64-linux-gnu/
 ./waf build
 sudo ./waf install
 sudo update-icon-caches /usr/share/icons/hicolor/
 ```
 
-If you get the error “RuntimeError: generator raised StopIteration” please 
-try putting `python2` before each call to `./waf` in the steps above.
+Package names vary by distribution. On Ubuntu 24.04, the verified working package set is `valac`, `libpeas-dev`, `libglib2.0-dev`, and `diodon-dev`.
 
 ## Debuging
 

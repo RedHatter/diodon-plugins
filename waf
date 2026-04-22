@@ -1,8 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # encoding: ISO8859-1
 # Thomas Nagy, 2005-2011
 # 
-# This script requires Python 2 to run.
+# This script requires Python 3 to run.
 
 """
 Redistribution and use in source and binary forms, with or without

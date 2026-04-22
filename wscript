@@ -19,6 +19,8 @@ def configure(conf):
     conf.load('vala', funs='')
     conf.load('python')
     conf.load('glib2')
+    if not conf.env['GLIB_COMPILE_SCHEMAS']:
+        conf.fatal('glib-compile-schemas is required to validate and install the plugin GSettings schemas')
     conf.env['PLUGINS_DIR'] = os.path.join(conf.env['LIBDIR'], 'diodon', 'plugins')
 
     conf.check_vala(min_version=(0, 16, 0))
@@ -26,6 +28,10 @@ def configure(conf):
     conf.check_cfg(package='diodon',      uselib_store='DIODON', atleast_version='1.6.0', mandatory=1, args='--cflags --libs')
     conf.check_cfg(package='libpeas-1.0', uselib_store='PEAS',   atleast_version='1.1.0', mandatory=1, args='--cflags --libs')
     conf.check_cfg(package='libpeas-gtk-1.0', uselib_store='PEASGTK',   atleast_version='1.1.0', mandatory=1, args='--cflags --libs')
+
+    diodon_include_dir = '/usr/include/diodon'
+    if os.path.exists(os.path.join(diodon_include_dir, 'diodon.h')):
+        conf.env.append_unique('INCLUDES_DIODON', [diodon_include_dir])
 
     conf.env['CFLAGS'] = ['-O0', '-g3', '-w']
     conf.env['VALAFLAGS'] = ['-g', '-v', '--enable-checking']

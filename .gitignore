@@ -1,0 +1,7 @@
+# Waf build output
+/_build_/
+/.lock-waf_*
+
+# Python bytecode from the bundled build system
+__pycache__/
+*.py[cod]

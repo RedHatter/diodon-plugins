@@ -6,7 +6,7 @@
 C/C++/D configuration helpers
 """
 
-import os, imp, sys, re, shlex, shutil
+import os, sys, re, shlex, shutil
 from waflib import Build, Utils, Configure, Task, Options, Logs, TaskGen, Errors, ConfigSet, Runner
 from waflib.TaskGen import before_method, after_method, feature
 from waflib.Configure import conf

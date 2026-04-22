@@ -19,7 +19,7 @@ Only two D compilers are really present at the moment:
 * dmd
 """
 
-import os, sys, imp, types
+import os, sys, types
 from waflib import Utils, Configure, Options, Logs
 
 def configure(conf):
